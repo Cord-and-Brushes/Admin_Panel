@@ -22,11 +22,11 @@ const EditBlog = () => {
     imageUrls: [],
   });
 
-  useEffect(() => {
-    const fetchBlogById = 
-  })
+  // useEffect(() => {
+  //   const fetchBlogById = 
+  // })
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
