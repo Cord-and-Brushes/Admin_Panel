@@ -9,7 +9,7 @@ import Modal from "react-modal";
 import api from "../api/api";
 import { useDispatch } from "react-redux";
 import { deleteProduct, fetchAllProducts } from "../features/productSlice";
-
+import CategoryName from "../features/categoryName"; // Adjust import path as per your file structure
 
 const ProductList = () => {
   const [allProducts, setAllProducts] = useState([]);
@@ -19,6 +19,8 @@ const ProductList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+
+
   useEffect(() => {
     const fetchInfo = async () => {
       setShowLoader(true); // Show loader when fetching data
@@ -26,18 +28,14 @@ const ProductList = () => {
         const response = await dispatch(fetchAllProducts()).unwrap();
         setAllProducts(response);
         console.log(response);
-        // const response = await api.get("/api/products/allproducts");
-        // setAllProducts(response.data.products);
-        // console.log(response)
       } catch (error) {
         console.error("Error fetching products:", error);
       }
-      setShowLoader(false); 
+      setShowLoader(false);
     };
 
     fetchInfo();
   }, []);
-
 
   const handleRemoveProduct = async (id) => {
     setProductToDelete(id); // Set the product ID to be deleted
@@ -49,7 +47,7 @@ const ProductList = () => {
     try {
       dispatch(deleteProduct(id));
       // Remove the product from the state
-      setAllProducts(allProducts.filter((product) => product.id !== id));
+      setAllProducts(allProducts.filter((product) => product._id !== id));
       toast.success("Product removed successfully", {
         position: "bottom-right",
         autoClose: 3000,
@@ -119,7 +117,7 @@ const ProductList = () => {
       <div>
         {allProducts?.length === 0 ? (
           <div className="flex flex-col justify-center items-center bg-black/60 py-8 rounded-full">
-            <img src={Empty} className="rounded-full h-64" />
+            <img src={Empty} className="rounded-full h-64" alt="Empty cart" />
             <p className="font-anta text-white text-center mt-5">
               No Products to show
             </p>
@@ -145,12 +143,14 @@ const ProductList = () => {
                     className="border-b border-white/40 p-6 medium-14"
                   >
                     <td className="p-2">
-                      <img src={product.images[0]} className="h-16 w-16" />
+                      <img src={product.images[0]} className="h-16 w-16" alt={product.name} />
                     </td>
                     <td className="p-2 font-anta">{product.name}</td>
                     <td className="p-2 font-anta">&#8377;{product.old_price}</td>
                     <td className="p-2 font-anta">&#8377;{product.new_price}</td>
-                    <td className="p-2 font-anta">{product.category_name}</td>
+                    <td className="p-2 font-anta">
+                      <CategoryName categoryId={product.category} />
+                    </td>
                     <td className="p-2 flex mt-6 gap-x-5 justify-center items-center">
                       <button
                         className="hover:text-orange-600"

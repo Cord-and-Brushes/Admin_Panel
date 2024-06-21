@@ -1,50 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Upload_area from "../assets/upload.png";
 import { PlusOutlined } from "@ant-design/icons";
 import { toast, Zoom } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import api from "../api/api";
 import { useDispatch } from "react-redux";
-import { createPost } from "../features/postSlice";
-import { useEffect } from "react";
-
+import { fetchPostById, updatePost } from "../features/postSlice";
+import { useParams, useNavigate } from "react-router-dom";
 
 const EditBlog = () => {
-    const { id } = useParams();
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [showLoader, setShowLoader] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [blogData, setBlogData] = useState({
     title: "",
-    content:"",
-    author:"",
-    quote:"",
+    content: "",
+    author: "",
+    quote: "",
     images: null,
     imageUrls: [],
   });
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchBlogById = 
-  })
+    const fetchBlog = async () => {
+      try {
+        const response = await dispatch(fetchPostById(id)).unwrap();
+        console.log(response.post);
+        setBlogData({
+          title: response.post.title,
+          author: response.post.author,
+          quote: response.post.quote,
+          content: response.post.content,
+          images: null,
+          imageUrls: response.post.bannerImage,
+        });
+      } catch (error) {
+        console.error("Error fetching blog data:", error);
+      }
+    };
 
-  const dispatch = useDispatch();
+    fetchBlog();
+  }, [id, dispatch]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setBlogData((prevState) => ({...prevState, [name]: value }));
+    setBlogData((prevState) => ({ ...prevState, [name]: value }));
   };
-
 
   const handleImageChange = (e) => {
     const files = e.target.files;
     const urls = Array.from(files).map((file) => URL.createObjectURL(file));
     setBlogData((prevState) => ({
-     ...prevState,
+      ...prevState,
       images: files,
       imageUrls: urls,
     }));
     setShowUpload(false);
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,24 +73,19 @@ const EditBlog = () => {
         formData.append("images", file);
       });
     }
-    
 
     try {
       const token = localStorage.getItem("token");
-      const response = await api.post("/api/blogs/createblog", formData, {
+      const response = await api.put(`/api/blogs/edit/${id}`, formData, {
         headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type":"multipart/form-data",
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       });
 
       const data = response.data;
-      console.log(response);
-      console.log(data);
-      // Handle success or error based on the response
       if (data.success) {
-        // Show success message only if the request was successful
-        toast.success("🦄 Blog Added", {
+        toast.success("🦄 Blog Updated", {
           position: "bottom-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -87,23 +96,14 @@ const EditBlog = () => {
           theme: "dark",
           transition: Zoom,
         });
-        setBlogData({
-            title: "",
-            author: "",
-            quote:"",
-            content: "",
-            images: null,
-            imageUrls: [], //store temp image urls
-          });
-          setShowUpload(true);
-          setShowLoader(false);
+
+        navigate("/admin/allblogs");
       } else {
-        // Optionally, handle other status codes here
         console.error("Unexpected response status:", response.status);
-      }      
+      }
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Error uploading product. Please try again.", {
+      toast.error("Error updating blog. Please try again.", {
         position: "bottom-right",
         autoClose: 1000,
         hideProgressBar: false,
@@ -114,17 +114,16 @@ const EditBlog = () => {
         theme: "dark",
         transition: Zoom,
       });
-      setShowLoader(false);
+    } finally {
+      setShowLoader(false); // Ensure the loader is hidden after the process
     }
   };
 
   return (
     <div className="text-white font-anta p-8 box-border bg-black/15 w-full rounded-sm mt-4 lg:m-7">
-      <h1 className="bold-22 font-anta text-center mb-5">
-        CREATE BLOG
-      </h1>
+      <h1 className="bold-22 font-anta text-center mb-5">EDIT BLOG</h1>
 
-      {/* ROW 1 / NAME & CATEGORY*/}
+      {/* ROW 1 / TITLE, AUTHOR, QUOTE */}
       <div className="flex flex-col lg:flex-row gap-x-10">
         {/* TITLE */}
         <div className="mb-3 max-w-[300px] w-full">
@@ -166,8 +165,7 @@ const EditBlog = () => {
         </div>
       </div>
 
-
-      {/* DESCRIPTION*/}
+      {/* CONTENT */}
       <div className="mb-3 w-full">
         <h4 className="font-anta bold-18 pb-2">Content:</h4>
         <textarea
@@ -180,13 +178,12 @@ const EditBlog = () => {
         />
       </div>
 
-
-      {/* ROW 5 / UPLOAD IMAGES */}
+      {/* UPLOAD IMAGES */}
       {showUpload ? (
         <div className="mt-10">
           <h4 className="font-anta bold-18 pb-2">Add Blog Image:</h4>
           <label
-            htmlFor="product-images-input"
+            htmlFor="blog-images-input"
             className="flex justify-center items-center flex-col border-2 border-2-white bg-black/50 rounded-md cursor-pointer"
           >
             <img
@@ -199,8 +196,8 @@ const EditBlog = () => {
           <input
             onChange={handleImageChange}
             type="file"
-            id="product-images-input"
-            name="productImage"
+            id="blog-images-input"
+            name="blogImage"
             multiple
             hidden
             className="bg-black/50 text-white outline-none max-w-80 w-full py-3 px-4 rounded-md"
@@ -221,7 +218,6 @@ const EditBlog = () => {
                   alt={`Selected ${index + 1}`}
                   className="w-full h-full object-cover rounded-md"
                 />
-                {/* <p className="text-white text-[10px] mt-2">{productData.images[index]?.name}</p> */}
               </div>
             ))}
           </div>
@@ -241,7 +237,7 @@ const EditBlog = () => {
         className="btn_dark_rounded mt-5 !rounded gap-x-1 flex justify-center items-center"
       >
         <PlusOutlined className="font-anta" />
-        Add Blog
+        Update Blog
       </button>
 
       {showLoader && (

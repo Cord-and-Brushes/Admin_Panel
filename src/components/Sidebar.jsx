@@ -13,17 +13,14 @@ import {
   ShoppingCartOutlined,
   FormOutlined,
   FundOutlined,
-  PictureOutlined,
 } from "@ant-design/icons";
 import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Typography,
-  IconButton,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 const Sidebar = () => {
   const isDesktopOrLaptop = useMediaQuery({ query: "(min-width: 1024px)" });
@@ -61,21 +58,19 @@ const Sidebar = () => {
 
       {/* Home */}
       <div
-        className={`p-5 flex hover:text-purple-400 medium-16 ${
+        className={`p-5 flex medium-16 ${
           !isDesktopOrLaptop && !isSidebarOpen ? "hidden" : ""
         }`}
       >
-        <Link to={""} onClick={closeSidebar}>
-          <button
-            className={`font-anta flex justify-center items-center gap-x-2 ${
-              isActive("")
-                ? "border-b-2 border-orange-600 text-orange-600"
-                : "border-b-black hover:border-b-white"
-            } hover:text-orange-600 text-white`}
-          >
-            <HomeOutlined />
-            Home
-          </button>
+        <Link
+          to={""}
+          onClick={closeSidebar}
+          className={`font-anta flex justify-center items-center gap-x-2 ${
+            isActive("/admin") ? "border-b-2 border-orange-600 text-orange-600" : "border-b-black hover:border-b-white text-white"
+          }`}
+        >
+          <HomeOutlined />
+          Home
         </Link>
       </div>
 
@@ -85,27 +80,24 @@ const Sidebar = () => {
           !isDesktopOrLaptop && !isSidebarOpen ? "hidden" : ""
         }`}
       >
-        <Link to={"userlist"} onClick={closeSidebar}>
-          <button
-            className={`font-anta flex justify-center items-center gap-x-2 ${
-              isActive("/")
-                ? "border-b-2 border-orange-600 text-orange-600"
-                : "border-b-black hover:border-b-white"
-            } hover:text-orange-600 text-white`}
-          >
-            {" "}
-            <UserOutlined />
-            Users
-          </button>
+        <Link
+          to={"userlist"}
+          onClick={closeSidebar}
+          className={`font-anta flex justify-center items-center gap-x-2 ${
+            isActive("/admin/userlist") ? "border-b-2 border-orange-600 text-orange-600" : "border-b-black hover:border-b-white text-white"
+          }`}
+        >
+          <UserOutlined />
+          Users
         </Link>
       </div>
 
       {/* Products Accordion */}
       <Accordion
         sx={{
-          backgroundColor: "black", // Set the background color to black
+          backgroundColor: "black",
           "&:hover": {
-            backgroundColor: "black", // Optional: Change the hover background color
+            backgroundColor: "black",
           },
         }}
       >
@@ -115,7 +107,7 @@ const Sidebar = () => {
               sx={{
                 color: "white",
                 "&:hover": {
-                  color: "#ea580c", // Optional: Change the hover background color
+                  color: "#ea580c",
                 },
               }}
             />
@@ -127,45 +119,110 @@ const Sidebar = () => {
             sx={{
               color: "white",
               "&:hover": {
-                color: "#ea580c", // Optional: Change the hover background color
+                color: "#ea580c",
               },
               fontFamily: "anta",
             }}
           >
-            <div className="flex justify-center items-center font-anta gap-x-2">
+            <span className="flex justify-center items-center font-anta gap-x-2">
               <ShoppingCartOutlined /> Products
-            </div>
+            </span>
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
+          <Typography component="div">
             <div className="flex flex-col gap-y-4">
               <div>
-                <Link to={"addproduct"} onClick={closeSidebar}>
-                  <button
-                    className={`font-anta flex justify-center items-center gap-x-2 gap-y-6 ${
-                      isActive("addproduct")
-                        ? "border-b-2 border-orange-600 text-orange-600"
-                        : "border-b-black hover:border-b-white"
-                    } hover:text-orange-600 text-white`}
-                  >
-                    <PlusOutlined />
-                    Add Products
-                  </button>
+                <Link
+                  to={"addproduct"}
+                  onClick={closeSidebar}
+                  className={`font-anta flex justify-center items-center gap-x-2 gap-y-6 ${
+                    isActive("/admin/addproduct") ? "border-b-2 border-orange-600 text-orange-600" : "border-b-black hover:border-b-white text-white"
+                  }`}
+                >
+                  <PlusOutlined />
+                  Add Products
                 </Link>
               </div>
               <div>
-                <Link to={"productlist"} onClick={closeSidebar}>
-                  <button
-                    className={`font-anta flex justify-center items-center gap-x-2 gap-y-6 ${
-                      isActive("productlist")
-                        ? "border-b-2 border-orange-600 text-orange-600"
-                        : "border-b-black hover:border-b-white"
-                    } hover:text-orange-600 text-white`}
-                  >
-                    <UnorderedListOutlined />
-                    Products List
-                  </button>
+                <Link
+                  to={"productlist"}
+                  onClick={closeSidebar}
+                  className={`font-anta flex justify-center items-center gap-x-2 gap-y-6 ${
+                    isActive("/admin/productlist") ? "border-b-2 border-orange-600 text-orange-600" : "border-b-black hover:border-b-white text-white"
+                  }`}
+                >
+                  <UnorderedListOutlined />
+                  Products List
+                </Link>
+              </div>
+            </div>
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Category Accordion */}
+      <Accordion
+        sx={{
+          backgroundColor: "black",
+          "&:hover": {
+            backgroundColor: "black",
+          },
+        }}
+      >
+        <AccordionSummary
+          expandIcon={
+            <ExpandMoreIcon
+              sx={{
+                color: "white",
+                "&:hover": {
+                  color: "#ea580c",
+                },
+              }}
+            />
+          }
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography
+            sx={{
+              color: "white",
+              "&:hover": {
+                color: "#ea580c",
+              },
+              fontFamily: "anta",
+            }}
+          >
+            <span className="flex justify-center items-center font-anta gap-x-2">
+              <ShoppingCartOutlined /> Categories
+            </span>
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography component="div">
+            <div className="flex flex-col gap-y-4">
+              <div>
+                <Link
+                  to={"addcategory"}
+                  onClick={closeSidebar}
+                  className={`font-anta flex justify-center items-center gap-x-2 gap-y-6 ${
+                    isActive("/admin/addcategory") ? "border-b-2 border-orange-600 text-orange-600" : "border-b-black hover:border-b-white text-white"
+                  }`}
+                >
+                  <PlusOutlined />
+                  Add Category
+                </Link>
+              </div>
+              <div>
+                <Link
+                  to={"allcategories"}
+                  onClick={closeSidebar}
+                  className={`font-anta flex justify-center items-center gap-x-2 gap-y-6 ${
+                    isActive("/admin/allcategories") ? "border-b-2 border-orange-600 text-orange-600" : "border-b-black hover:border-b-white text-white"
+                  }`}
+                >
+                  <UnorderedListOutlined />
+                  Category List
                 </Link>
               </div>
             </div>
@@ -176,9 +233,9 @@ const Sidebar = () => {
       {/* Blogs Accordion */}
       <Accordion
         sx={{
-          backgroundColor: "black", // Set the background color to black
+          backgroundColor: "black",
           "&:hover": {
-            backgroundColor: "black", // Optional: Change the hover background color
+            backgroundColor: "black",
           },
         }}
       >
@@ -188,7 +245,7 @@ const Sidebar = () => {
               sx={{
                 color: "white",
                 "&:hover": {
-                  color: "#ea580c", // Optional: Change the hover background color
+                  color: "#ea580c",
                 },
               }}
             />
@@ -200,47 +257,43 @@ const Sidebar = () => {
             sx={{
               color: "white",
               "&:hover": {
-                color: "#ea580c", // Optional: Change the hover background color
+                color: "#ea580c",
               },
               fontFamily: "anta",
             }}
           >
-            <div className="flex justify-center items-center font-anta gap-x-2">
+            <span className="flex justify-center items-center font-anta gap-x-2">
               <FormOutlined />
               Blogs
-            </div>
+            </span>
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
+          <Typography component="div">
             <div className="flex flex-col gap-y-4">
               <div>
-                <Link to={"addblog"} onClick={closeSidebar}>
-                  <button
-                    className={`font-anta flex justify-center items-center gap-x-2 gap-y-6 ${
-                      isActive("productlist")
-                        ? "border-b-2 border-orange-600 text-orange-600"
-                        : "border-b-black hover:border-b-white"
-                    } hover:text-orange-600 text-white`}
-                  >
-                    <PlusOutlined />
-                    Create Blog
-                  </button>
+                <Link
+                  to={"addblog"}
+                  onClick={closeSidebar}
+                  className={`font-anta flex justify-center items-center gap-x-2 gap-y-6 ${
+                    isActive("/admin/addblog") ? "border-b-2 border-orange-600 text-orange-600" : "border-b-black hover:border-b-white text-white"
+                  }`}
+                >
+                  <PlusOutlined />
+                  Create Blog
                 </Link>
               </div>
 
               <div>
-                <Link to={"allblogs"} onClick={closeSidebar}>
-                  <button
-                    className={`font-anta flex justify-center items-center gap-x-2 gap-y-6 ${
-                      isActive("productlist")
-                        ? "border-b-2 border-orange-600 text-orange-600"
-                        : "border-b-black hover:border-b-white"
-                    } hover:text-orange-600 text-white`}
-                  >
-                    <UnorderedListOutlined />
-                    All Blogs
-                  </button>
+                <Link
+                  to={"allblogs"}
+                  onClick={closeSidebar}
+                  className={`font-anta flex justify-center items-center gap-x-2 gap-y-6 ${
+                    isActive("/admin/allblogs") ? "border-b-2 border-orange-600 text-orange-600" : "border-b-black hover:border-b-white text-white"
+                  }`}
+                >
+                  <UnorderedListOutlined />
+                  All Blogs
                 </Link>
               </div>
             </div>
@@ -251,9 +304,9 @@ const Sidebar = () => {
       {/* Banners Accordion */}
       <Accordion
         sx={{
-          backgroundColor: "black", // Set the background color to black
+          backgroundColor: "black",
           "&:hover": {
-            backgroundColor: "black", // Optional: Change the hover background color
+            backgroundColor: "black",
           },
         }}
       >
@@ -263,7 +316,7 @@ const Sidebar = () => {
               sx={{
                 color: "white",
                 "&:hover": {
-                  color: "#ea580c", // Optional: Change the hover background color
+                  color: "#ea580c",
                 },
               }}
             />
@@ -275,120 +328,41 @@ const Sidebar = () => {
             sx={{
               color: "white",
               "&:hover": {
-                color: "#ea580c", // Optional: Change the hover background color
+                color: "#ea580c",
               },
               fontFamily: "anta",
             }}
           >
-            <div className="flex justify-center items-center font-anta gap-x-2">
+            <span className="flex justify-center items-center font-anta gap-x-2">
               <FundOutlined /> Banners
-            </div>
+            </span>
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
+          <Typography component="div">
             <div className="flex flex-col gap-y-4">
               <div>
-                <Link to={"bannersection"} onClick={closeSidebar}>
-                  <button
-                    className={`font-anta flex justify-center items-center gap-x-2 ${
-                      isActive("bannersection")
-                        ? "border-b-2 border-orange-600 text-orange-600"
-                        : "border-b-black hover:border-b-white"
-                    } hover:text-orange-600 text-white`}
-                  >
-                    <FlagOutlined />
-                    Upload Banner
-                  </button>
+                <Link
+                  to={"bannersection"}
+                  onClick={closeSidebar}
+                  className={`font-anta flex justify-center items-center gap-x-2 ${
+                    isActive("/admin/bannersection") ? "border-b-2 border-orange-600 text-orange-600" : "border-b-black hover:border-b-white text-white"
+                  }`}
+                >
+                  <FlagOutlined />
+                  Upload Banner
                 </Link>
               </div>
               <div>
-                <Link to={"allbanners"} onClick={closeSidebar}>
-                  <button
-                    className={`font-anta flex justify-center items-center gap-x-2 ${
-                      isActive("allbanners")
-                        ? "border-b-2 border-orange-600 text-orange-600"
-                        : "border-b-black hover:border-b-white"
-                    } hover:text-orange-600 text-white`}
-                  >
-                    <MenuOutlined />
-                    All Banners
-                  </button>
-                </Link>
-              </div>
-            </div>
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-
-      {/* Exhibitions Accordion */}
-      <Accordion
-        sx={{
-          backgroundColor: "black", // Set the background color to black
-          "&:hover": {
-            backgroundColor: "black", // Optional: Change the hover background color
-          },
-        }}
-      >
-        <AccordionSummary
-          expandIcon={
-            <ExpandMoreIcon
-              sx={{
-                color: "white",
-                "&:hover": {
-                  color: "#ea580c", // Optional: Change the hover background color
-                },
-              }}
-            />
-          }
-          aria-controls="panel4a-content"
-          id="panel4a-header"
-        >
-          <Typography
-            sx={{
-              color: "white",
-              "&:hover": {
-                color: "#ea580c", // Optional: Change the hover background color
-              },
-              fontFamily: "anta",
-            }}
-          >
-            <div className="flex justify-center items-center font-anta gap-x-2">
-            <PictureOutlined />
-              Exhibitions
-            </div>
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            <div className="flex flex-col gap-y-4">
-              <div>
-                {" "}
-                <Link to={"productlist"} onClick={closeSidebar}>
-                  <button
-                    className={`font-anta flex justify-center items-center gap-x-2 ${
-                      isActive("productlist")
-                        ? "border-b-2 border-orange-600 text-orange-600"
-                        : "border-b-black hover:border-b-white"
-                    } hover:text-orange-600 text-white`}
-                  >
-                    <FileImageOutlined />
-                    All Exhibition Post
-                  </button>
-                </Link>
-              </div>
-              <div>
-                <Link to={"productlist"} onClick={closeSidebar}>
-                  <button
-                    className={`font-anta flex justify-center items-center gap-x-2 ${
-                      isActive("productlist")
-                        ? "border-b-2 border-orange-600 text-orange-600"
-                        : "border-b-black hover:border-b-white"
-                    } hover:text-orange-600 text-white`}
-                  >
-                    <FileImageOutlined />
-                    Create Exhi. Post
-                  </button>
+                <Link
+                  to={"allbanners"}
+                  onClick={closeSidebar}
+                  className={`font-anta flex justify-center items-center gap-x-2 ${
+                    isActive("/admin/allbanners") ? "border-b-2 border-orange-600 text-orange-600" : "border-b-black hover:border-b-white text-white"
+                  }`}
+                >
+                  <MenuOutlined />
+                  All Banners
                 </Link>
               </div>
             </div>

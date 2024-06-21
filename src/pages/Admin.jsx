@@ -13,6 +13,8 @@ import EditBanner from '../components/EditBanner';
 import AddBlog from '../components/AddBlog';
 import AllBlogs from '../components/AllBlogs';
 import EditBlog from '../components/EditBlog';
+import AddCategory from '../components/AddCategory';
+import AllCategories from '../components/AllCategories';
 
 // 
 
@@ -37,6 +39,8 @@ const Admin = () => {
         <Route path="addblog"  element={<AddBlog />}/>
         <Route path="allblogs"  element={<AllBlogs />}/>
         <Route path="editblog/:id"  element={<EditBlog />}/>
+        <Route path="addcategory"  element={<AddCategory />}/>
+        <Route path="allcategories"  element={<AllCategories />}/>
       </Routes>
     </div>
  </div>
