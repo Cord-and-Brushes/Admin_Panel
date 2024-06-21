@@ -18,6 +18,7 @@ import api from "../api/api";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllUsers } from "../features/authSlice";
 import Empty from "../assets/empty-cart.jpg";
+
 // Explicitly register the elements and scales
 ChartJS.register(
   ArcElement,
@@ -35,41 +36,58 @@ ChartJS.register(
 
 const Home = () => {
   const [allProducts, setAllProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [productCounts, setProductCounts] = useState({});
   const [showLoader, setShowLoader] = useState(false);
   const dispatch = useDispatch();
   const allUsers = useSelector((state) => state.auth.users);
 
   useEffect(() => {
-    const fetchInfo = async () => {
+    const fetchData = async () => {
       setShowLoader(true); // Show loader when fetching data
       try {
-        const response = await api.get("/api/products/allproducts");
-        setAllProducts(response.data.products);
+        // Fetch all products
+        const responseProducts = await api.get("/api/products/allproducts");
+        setAllProducts(responseProducts.data.products);
+
+        // Fetch all categories
+        const responseCategories = await api.get("/api/categories/allcategories");
+        const categoriesData = responseCategories.data.categories || [];
+        setCategories(categoriesData);
+
+        // Fetch product counts for each category
+        const productCountsPromises = categoriesData.map((category) =>
+          api.get(`/api/products/category/${category._id}`)
+        );
+        const productCountsResponses = await Promise.all(productCountsPromises);
+        const counts = {};
+        productCountsResponses.forEach((res, index) => {
+          counts[categoriesData[index]._id] = res.data.products.length;
+        });
+        setProductCounts(counts);
+
+        // Fetch all users
         await dispatch(fetchAllUsers());
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching data:", error);
       }
       setShowLoader(false); // Hide loader after fetching data
     };
 
-    fetchInfo();
-  }, []);
+    fetchData();
+  }, [dispatch]); // Added dispatch as a dependency
+
+  const totalProducts = allProducts.length;
+  const numberOfCategories = categories.length;
+
+  const productsInEachCategory = categories.map((category) => ({
+    title: category.name,
+    number: productCounts[category._id] || 0,
+  }));
 
   console.log(allProducts);
-  console.log(allUsers);
-
-  const numberOfUser = allUsers?.length;
-
-  const categories = [
-    ...new Set(allProducts.map((product) => product.category_name)),
-  ];
-  const numberOfCategories = categories?.length;
-  const totalProducts = allProducts?.length;
-  const productsInEachCategory = categories.map((category) => ({
-    title: category,
-    number: allProducts.filter((product) => product.category_name === category)
-      .length,
-  }));
+  console.log("Categories: ", categories);
+  console.log("Product Counts: ", productCounts);
 
   const pieData = {
     labels: productsInEachCategory.map((category) => category.title),
@@ -227,7 +245,7 @@ const Home = () => {
   };
 
   return (
-    <div className="text-white flex flex-col  w-full rounded-sm mt-4 lg:m-7 p-8 box-border">
+    <div className="text-white flex flex-col w-full rounded-sm mt-4 lg:m-7 p-8 box-border">
       <div className="flex flex-col gap-y-4 lg:grid lg:grid-cols-3 gap-x-2 lg:gap-x-10">
         {/* Row 1 */}
         <div className="p-5 text-center ring-1 ring-white rounded-md">
@@ -244,101 +262,55 @@ const Home = () => {
         </div>
         <div className="p-5 text-center ring-1 ring-white rounded-md">
           <h3 className="font-anta text-[24px]">No. of Users</h3>
-          <div className="font-anta text-[30px] text-extrabold">{numberOfUser}</div>
+          <div className="font-anta text-[30px] text-extrabold">{allUsers.length}</div>
         </div>
       </div>
 
-
-      {/* row 2 */}
-      <div>
-        <h4 className="font-anta text-center mt-10 text-[24px]">
-          No. of Products in Each Category
-        </h4>
-      </div>
-
-        <div>
-          {allProducts.length > 0 ? (
-            <div className="flex flex-col gap-y-4 lg:grid lg:grid-cols-4 gap-x-2 lg:gap-x-10 mt-2">
-            {/* Row 2 */}
-            {productsInEachCategory.map((pr, index) => (
-              <div
-                key={index}
-                className="p-5 text-center ring-1 ring-white rounded-md"
-              >
-                <h3 className="font-anta text-[24px]">{pr.title}</h3>
-                <div className="font-anta text-[30px] text-extrabold">
-                  {pr.number}
-                </div>
+      {/* Products in Each Category */}
+      <div className="mt-8">
+        <h4 className="font-anta text-center text-[24px]">Products in Each Category</h4>
+        {categories.length > 0 ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+            {productsInEachCategory.map((category, index) => (
+              <div key={index} className="p-5 text-center ring-1 ring-white rounded-md">
+                <h5 className="font-anta text-[24px] capitalize">{category.title}</h5>
+                <p className="font-anta text-white text-[30px] text-extrabold">{category.number}</p>
               </div>
             ))}
           </div>
-          ) : (
-            <div className="flex flex-col justify-center items-center bg-black/60 py-8 rounded-full">
-            <img src={Empty} className="rounded-full h-64" />
-            <p className="font-anta text-white text-center mt-5">
-              No Products to show
-            </p>
+        ) : (
+          <div className="flex flex-col items-center mt-6">
+            <img src={Empty} alt="Empty Cart" className="w-64 h-64 rounded-full" />
+            <p className="text-lg font-semibold mt-4">No categories found</p>
           </div>
-          )}
-        </div>
-
-
-
-
-
-       {/* <div className="flex flex-col gap-y-4 lg:grid lg:grid-cols-4 gap-x-2 lg:gap-x-10 mt-2">
-         Row 2
-         {productsInEachCategory.map((pr, index) => (
-           <div
-             key={index}
-             className="p-5 text-center ring-1 ring-black rounded-md"
-           >
-             <h3 className="font-anta text-[24px]">{pr.title}</h3>
-             <div className="font-anta text-[30px] text-extrabold">
-               {pr.number}
-             </div>
-           </div>
-         ))}
-       </div> */}
-
-      <div>
-        <h4 className="font-anta text-center mt-10 text-[24px]">
-          Graphical representation
-        </h4>
+        )}
       </div>
 
-      <div className="flex lg:flex-row flex-col justify-center items-center mt-2 gap-x-20">
-        {/* Row 3 */}
-
+      {/* Graphical representation */}
+      <div className="mt-10 flex flex-col lg:flex-row gap-x-20 justify-center items-center">
         {/* PIE CHART */}
-        <div className="mt-10 max-w-[300px] w-full ring-1 ring-white p-6 rounded-md text-white">
-          <h4 className="font-anta text-center mt-10 text-[24px]">
-            Products Distribution
-          </h4>
+        <div className="max-w-[300px] w-full ring-1 ring-white p-6 rounded-md text-white">
+          <h4 className="font-anta text-center mt-10 text-[24px]">Products Distribution</h4>
           <Pie data={pieData} options={pieOptions} />
         </div>
 
         {/* RADAR CHART */}
-        <div className="mt-10 max-w-[300px] w-full ring-1 ring-white p-6 rounded-md text-white">
-          <h4 className="font-anta text-center mt-10 text-[24px]">
-            Products by Brand
-          </h4>
+        <div className="max-w-[300px] w-full ring-1 ring-white p-6 rounded-md text-white">
+          <h4 className="font-anta text-center mt-10 text-[24px]">Products by Brand</h4>
           <Radar data={radarData} options={radarOptions} />
         </div>
 
         {/* DONUT CHART */}
-        <div className="mt-10 max-w-[300px] w-full ring-1 ring-white p-6 rounded-md text-white">
-          <h4 className="font-anta text-center mt-10 text-[24px]">
-            User Demographics
-          </h4>
+        <div className="max-w-[300px] w-full ring-1 ring-white p-6 rounded-md text-white">
+          <h4 className="font-anta text-center mt-10 text-[24px]">User Demographics</h4>
           <Doughnut data={donutData} options={donutOptions} />
         </div>
       </div>
+
+      {/* Bar Chart */}
       <div className="mt-10 w-full ring-1 ring-white p-6 rounded-md">
-        <h4 className="font-anta text-center mt-10 text-[24px]">
-          Products in Each Category
-        </h4>
-        <Bar data={barData} options={barOptions} className=" lg:h-[300px]" />
+        <h4 className="font-anta text-center mt-10 text-[24px]">Products in Each Category</h4>
+        <Bar data={barData} options={barOptions} className="h-[300px]" />
       </div>
     </div>
   );
