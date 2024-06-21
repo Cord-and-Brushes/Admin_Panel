@@ -23,6 +23,7 @@ const EditBlog = () => {
   });
   const dispatch = useDispatch();
 
+
   useEffect(() => {
     const fetchBlog = async () => {
       try {
@@ -43,6 +44,8 @@ const EditBlog = () => {
 
     fetchBlog();
   }, [id, dispatch]);
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
