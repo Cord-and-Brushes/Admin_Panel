@@ -44,10 +44,6 @@ const CategoryList = () => {
     fetchCategories();
   }, []);
 
-  const handleRemoveCategory = async (id) => {
-    setCategoryToDelete(id);
-    setIsModalOpen(true);
-  };
 
   const deleteCategoryHandler = async (id) => {
     setShowLoader(true);
@@ -77,11 +73,7 @@ const CategoryList = () => {
     setIsModalOpen(false);
   };
 
-  const handleEditCategory = (id) => {
-    setShowLoader(true);
-    navigate(`/admin/editcategory/${id}`);
-    setShowLoader(false);
-  };
+  
 
   const toggleCategoryStatus = async (id) => {
     setShowLoader(true);
